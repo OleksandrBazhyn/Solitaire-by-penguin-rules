@@ -40,7 +40,7 @@ class Game:
             for j in range(7):
                 self.column[j].append(self.deck.pop(0))
         
-    #Створюємо та тусуємо колоду
+    #Створюємо та тасуємо колоду
     def create_deck(self):
         # Створюємо список з номіналами карт (2-10, J, Q, K, A)
         self.ranks = [str(num) for num in range(2, 11)] + list('JQKA')
