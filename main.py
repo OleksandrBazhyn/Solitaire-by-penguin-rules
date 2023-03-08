@@ -23,7 +23,7 @@ class Game:
         def size(self):
             return len(self.items)
         
-    column = GameColumn()
+    columns = GameColumn()
 
     def __init__(self):
         self.start()
@@ -33,12 +33,12 @@ class Game:
         self.create_deck()
 
         # Створюємо 7 ігрових стопок
-        self.column = [[] for _ in range(7)]
+        self.columns = [[] for _ in range(7)]
 
         # Розкладаємо по 7 карт на кожну стопку
         for i in range(7):
             for j in range(7):
-                self.column[j].append(self.deck.pop(0))
+                self.columns[j].append(self.deck.pop(0))
         
     #Створюємо та тасуємо колоду
     def create_deck(self):
@@ -58,7 +58,7 @@ game = Game()
 
 # Виводимо стопки на екран
 for i in range(7):
-    print(f"Стопка {i+1}: {game.column[i]}")
+    print(f"Стопка {i+1}: {game.columns[i]}")
 
 # Виводимо колоду на екран
 print("\nКолода:")
