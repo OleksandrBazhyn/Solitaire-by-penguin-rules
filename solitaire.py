@@ -18,8 +18,7 @@ class GameColumn:
                 self.items.append(item)
 
         def push(self, item):
-            if self.card_checking(item):
-                self.items.append(item)
+            self.items.append(item)
 
         def pop(self):
             return self.items.pop()
@@ -137,7 +136,7 @@ class Game:
         # Розкладаємо по 7 карт на кожну стопку
         for i in range(7):
             for j in range(7):
-                self.game_columns[j].put_in(self.deck.pop(0))
+                self.game_columns[j].push(self.deck.pop(0))
         
         #Створюємо 7 резервних стопок
         self.reserve_columns = [ReserveColumn() for _ in range(7)]
