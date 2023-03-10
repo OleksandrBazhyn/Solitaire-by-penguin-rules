@@ -5,11 +5,23 @@ class GameColumn:
         def __init__(self):
             self.items = []
 
-        def put_in(self, item):
+        def put_in_GC(self, item):
             if self.card_checking(item):
                 self.items.append(item)
-        #
-        def put_from(self):
+
+        def put_in_RC(self, item):
+            if self.card_checking(item):
+                self.items.append(item)
+
+        def put_in_BC(self, item):
+            if self.card_checking(item):
+                self.items.append(item)
+
+        def push(self, item):
+            if self.card_checking(item):
+                self.items.append(item)
+
+        def pop(self):
             return self.items.pop()
 
         def is_empty(self):
@@ -22,16 +34,12 @@ class GameColumn:
            return str(self.items)
         
         def card_checking(self, item):
-            last_card = self.last_card()
             if self.is_empty():
                 return True
-            elif item[1] == last_card[1] and self.rank_int_value(last_card[0])-self.rank_int_value(item[0]) == 1:
+            elif item[1] == self.items[-1][1] and self.rank_int_value(self.items[-1][0])-self.rank_int_value(item[0]) == 1:
                 return True
             else:
                 return False
-            
-        def last_card(self):
-            return self.items[-1]
         
         def rank_int_value(self, rank):
             item_rank = 1
