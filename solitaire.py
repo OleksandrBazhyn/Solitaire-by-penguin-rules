@@ -19,9 +19,6 @@ class GameColumn:
         
         def __str__(self):
            return str(self.items)
-        
-        def _show(self, index):
-            return self.items[index]
 
 class ReserveColumn:
     def __init__(self, element=None):
@@ -38,26 +35,42 @@ class ReserveColumn:
 
 class BasicColumn:
     rank = 1
-    suit = None
+    suit = 'None'
 
     def __init__(self):
         self.items = []
 
     def push(self, item):
-         if self.card_checking(self, item):
-            self.items.append(item)         
+        if self.card_checking(item):
+            self.items.append(item)
+        else:
+            return ValueError         
 
     def card_checking(self, item):
-        if self.suit == None and item[0]-self.rank == 1:
+        if self.suit == 'None' and self.rank_int_value(item[0])-self.rank == 1:
             self.suit = item[1]
             self.rank = item[0]
-            print(f"У цьому базовому стопці ранг: ${self.rank}, а масть: ${self.suit}")
             return True
-        elif (item[1] == self.suit) and (item[0]-self.rank == 1):
+        elif item[1] == self.suit and self.rank_int_value(item[0])-self.rank == 1:
             self.rank = item[0]
             return True
         else:
-            print(f"У цієї карти ранг: ${self.rank}, а масть: ${self.suit}")
+            return False
+
+    def rank_int_value(self, rank):
+        item_rank = 1
+        try:
+            item_rank = int(rank)
+        except ValueError:
+            if rank == 'J':
+                item_rank = 11
+            elif rank == 'Q':
+                item_rank = 12
+            elif rank == 'K':
+                item_rank = 13
+            else:
+                item_rank = 14
+        return item_rank
 
     def is_empty(self):
        return len(self.items) == 0
@@ -67,9 +80,6 @@ class BasicColumn:
         
     def __str__(self):
        return str(self.items)
-    
-    def _show(self, index):
-        return self.items[index]
 
 class Game:
     #Пов'язане з картами
@@ -101,7 +111,7 @@ class Game:
 
         #Створюємо 4 базових стопок
         self.basic_columns = [BasicColumn() for _ in range(4)]
-        
+    
     #Створюємо та тасуємо колоду
     def create_deck(self):
         # Створюємо список з номіналами карт (2-10, J, Q, K, A)
@@ -115,3 +125,21 @@ class Game:
 
         # Тасуємо колоду
         random.shuffle(self.deck)
+
+    def show_table(self):
+        # Виводимо резервні стопки на екран
+        for i in range(7):
+            print(f"Резерв {i+1}: {self.reserve_columns[i]}")
+
+        # Виводимо ігрові стопки на екран
+        for i in range(7):
+            print(f"Стопка {i+1}: {self.game_columns[i]}")
+
+        # Виводимо колоду на екран
+        print("\nКолода:")
+        for el in self.deck:
+            print(el)
+
+        # Виводимо базові стопки на екран
+        for i in range(4):
+            print(f"Базова стопка {i+1}: {self.basic_columns[i]}")
