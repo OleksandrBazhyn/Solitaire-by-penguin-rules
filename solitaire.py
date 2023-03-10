@@ -4,21 +4,15 @@ import random
 class GameColumn:
         def __init__(self):
             self.items = []
-
-        def put_in_GC(self, item):
-            if self.card_checking(item):
-                self.items.append(item)
-
-        def put_in_RC(self, item):
-            if self.card_checking(item):
-                self.items.append(item)
-
-        def put_in_BC(self, item):
-            if self.card_checking(item):
-                self.items.append(item)
-
+            
         def push(self, item):
             self.items.append(item)
+        
+        def put_in(self, item):
+            if self.card_checking(item):
+                self.items.append(item)
+            else:
+                return ValueError
 
         def pop(self):
             return self.items.pop()
@@ -195,3 +189,13 @@ class Game:
     # Гра закінчується, пропонується нова гра
     def end(self):
         return KeyError
+    
+    def GC_to_GC(self, out_path, in_path):
+        out_path = int(out_path)
+        in_path = int(in_path)
+        if self.game_columns[out_path - 1].is_empty():
+            return ValueError
+        else:            
+            card = self.game_columns[out_path - 1].pop(-1)
+            print(card)
+            self.game_columns[in_path - 1].put_in(card)
