@@ -9,13 +9,13 @@ class GameColumn:
             self.items.append(item)
         
         def put_in(self, item):
-            if self.card_checking(item):
-                self.items.append(item)
-            else:
-                return ValueError
+            self.items.append(item)
 
         def pop(self):
             return self.items.pop()
+
+        def pop_last_card(self):
+            return self.items.pop(-1)
 
         def is_empty(self):
             return len(self.items) == 0
@@ -29,11 +29,14 @@ class GameColumn:
         def card_checking(self, item):
             if self.is_empty():
                 return True
-            elif item[1] == self.items[-1][1] and self.rank_int_value(self.items[-1][0])-self.rank_int_value(item[0]) == 1:
+            elif item[1] == self.last_card()[1] and self.rank_int_value(self.last_card()[0])-self.rank_int_value(item[0]) == 1:
                 return True
             else:
                 return False
         
+        def last_card(self):
+            return self.items[-1]
+
         def rank_int_value(self, rank):
             item_rank = 1
             try:
@@ -172,6 +175,10 @@ class Game:
             # Виводимо базові стопки на екран
             for i in range(4):
                 print(f"Базова стопка {i+1}: {self.basic_columns[i]}")
+            
+            for i in range(120):
+                print("=", end="")
+            print()
     
     def check_win(self):
         win_str = ''
@@ -195,7 +202,7 @@ class Game:
         in_path = int(in_path)
         if self.game_columns[out_path - 1].is_empty():
             return ValueError
-        else:            
-            card = self.game_columns[out_path - 1].pop(-1)
-            print(card)
-            self.game_columns[in_path - 1].put_in(card)
+        elif self.game_columns[in_path - 1].card_checking(self.game_columns[out_path - 1].last_card()):
+            self.game_columns[in_path - 1].put_in(self.game_columns[out_path - 1].pop_last_card())
+        else:
+            return ValueError
