@@ -11,9 +11,6 @@ class GameColumn:
         def put_in(self, item):
             self.items.append(item)
 
-        # def pop(self):
-        #     return self.items.pop()
-
         def pop_last_card(self):
             return self.items.pop(-1)
 
@@ -36,7 +33,10 @@ class GameColumn:
                 return False
         
         def last_card(self):
-            return self.items[-1]
+            try:
+                return self.items[-1]
+            except:
+                return ValueError
 
         def rank_int_value(self, rank):
             item_rank = 1
@@ -63,8 +63,16 @@ class ReserveColumn:
     def get_element(self):
         return self.element
     
+    def pop_element(self):
+        card = self.element
+        self.element = None
+        return card
+    
     def __str__(self):
            return str(self.element)
+    
+    def is_empty(self):
+        return self.element == None
 
 class BasicColumn:
     rank = 1
@@ -74,18 +82,15 @@ class BasicColumn:
         self.items = []
 
     def put_in(self, item):
-        if self.card_checking(item):
-            self.items.clear()
-            self.items.append(item)
-        else:
-            return ValueError         
+        self.items.clear()
+        self.items.append(item)    
 
     def card_checking(self, item):
         if self.suit == 'None' and self.rank_int_value(item[0])-self.rank == 1:
             self.suit = item[1]
             self.rank = item[0]
             return True
-        elif item[1] == self.suit and self.rank_int_value(item[0])-self.rank == 1:
+        elif item[1] == self.suit and self.rank_int_value(item[0])-self.rank_int_value(self.rank) == 1:
             self.rank = item[0]
             return True
         else:
@@ -201,9 +206,81 @@ class Game:
     def GC_to_GC(self, out_path, in_path):
         out_path = int(out_path)
         in_path = int(in_path)
-        if self.game_columns[out_path - 1].is_empty():
+        if (out_path <= 7 and in_path <= 7) and (out_path > 0 and in_path > 0):
+            if self.game_columns[out_path - 1].is_empty():
+                return ValueError
+            elif self.game_columns[in_path - 1].card_checking(self.game_columns[out_path - 1].last_card()):
+                self.game_columns[in_path - 1].put_in(self.game_columns[out_path - 1].pop_last_card())
+            else:
+                return ValueError
+        else:
             return ValueError
-        elif self.game_columns[in_path - 1].card_checking(self.game_columns[out_path - 1].last_card()):
-            self.game_columns[in_path - 1].put_in(self.game_columns[out_path - 1].pop_last_card())
+        
+    def GC_to_RC(self, out_path, in_path):
+        out_path = int(out_path)
+        in_path = int(in_path)
+        if self.game_columns[out_path - 1].is_empty():
+                return ValueError
+        elif (out_path <= 7 and in_path <= 7) and (out_path > 0 and in_path > 0):
+            if self.reserve_columns[in_path - 1].is_empty():
+                self.reserve_columns[in_path - 1].set_element(self.game_columns[out_path - 1].pop_last_card())
+            else:
+                return ValueError
+        else:
+            return ValueError
+        
+    def GC_to_BC(self, out_path, in_path):
+        out_path = int(out_path)
+        in_path = int(in_path)
+        if self.game_columns[out_path - 1].is_empty():
+                return ValueError
+        elif (out_path <= 7 and in_path <= 4) and (out_path > 0 and in_path > 0):
+            if self.basic_columns[in_path - 1].card_checking(self.game_columns[out_path - 1].last_card()):
+                self.basic_columns[in_path - 1].put_in(self.game_columns[out_path - 1].pop_last_card())
+            else:
+                return ValueError
+        else:
+            return ValueError
+        
+    def RC_to_BC(self, out_path, in_path):
+        out_path = int(out_path)
+        in_path = int(in_path)
+        if self.reserve_columns[out_path - 1].is_empty():
+                return ValueError
+        elif (out_path <= 7 and in_path <= 4) and (out_path > 0 and in_path > 0):
+            if self.basic_columns[in_path - 1].card_checking(self.reserve_columns[out_path - 1].get_element()):
+                self.basic_columns[in_path - 1].put_in(self.reserve_columns[out_path - 1].pop_element())
+            else:
+                return ValueError
+        else:
+            return ValueError
+        
+    # def deck_to_BC(self, in_path):
+    #     in_path = int(in_path)
+    #     if self.deck == []:
+    #             return ValueError
+    #     elif in_path <= 4 and in_path > 0:
+    #         if self.basic_columns[in_path - 1].card_checking(self.__last_deck_card()):
+    #             self.basic_columns[in_path - 1].put_in(self.deck.pop(-1))
+    #         else:
+    #             return ValueError
+    #     else:
+    #         return ValueError
+        
+    # def __last_deck_card(self):
+    #     try:
+    #        return self.deck[-1]
+    #     except:
+    #        return ValueError
+    
+    def deck_to_GC(self, in_path):
+        in_path = int(in_path)
+        if self.deck == []:
+                return ValueError
+        elif in_path <= 7 and in_path > 0:
+            if self.game_columns[in_path - 1].is_empty():
+                self.game_columns[in_path - 1].put_in(self.deck.pop(-1))
+            else:
+                return ValueError
         else:
             return ValueError
