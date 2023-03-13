@@ -1,5 +1,6 @@
 import itertools
 import random
+import time
 
 class GameColumn:
         def __init__(self):
@@ -121,6 +122,8 @@ class BasicColumn:
        return str(self.items)
 
 class Game:
+    start_time = None
+    end_time = None
     deck = []
     game_columns = []
     reserve_columns = []
@@ -131,7 +134,10 @@ class Game:
 
     #Починаємо гру
     def start(self):
-        self.create_deck()
+        print()
+        self.show_rules()
+        self.start_time = time.time()
+        self.__create_deck()
 
         # Створюємо 7 ігрових стопок
         self.game_columns = [GameColumn() for _ in range(7)]
@@ -146,9 +152,11 @@ class Game:
 
         #Створюємо 4 базових стопок
         self.basic_columns = [BasicColumn() for _ in range(4)]
+
+        self.show_table()
     
     #Створюємо та тасуємо колоду
-    def create_deck(self):
+    def __create_deck(self):
         # Створюємо список з номіналами карт (2-10, J, Q, K, A)
         ranks = [str(num) for num in range(2, 11)] + list('JQKA')
 
@@ -162,7 +170,7 @@ class Game:
         random.shuffle(self.deck)
 
     def show_table(self):
-        if self.check_win():
+        if self.__check_win():
             return self.triumph()
         else:
             for i in range(125):
@@ -178,7 +186,7 @@ class Game:
                 print(f"Стопка {i+1}: {self.game_columns[i]}")
 
             # Виводимо колоду на екран
-            print("\nКолода:")
+            print("\nЗапас:")
             for el in self.deck:
                 print(el)
 
@@ -186,7 +194,7 @@ class Game:
             for i in range(4):
                 print(f"Базова стопка {i+1}: {self.basic_columns[i]}")
     
-    def check_win(self):
+    def __check_win(self):
         win_str = ''
         for column in range(4):
             win_str += str(self.basic_columns[column].rank)
@@ -197,11 +205,33 @@ class Game:
 
     # Перемога, привітання, закінчення гри
     def triumph(self):
+        for i in range(31):
+            print("*\\*/", end="")
+        print("\n")     
+
+        print("Вітаю, ви перемогли!\n")             
+
         self.end()
-    
+        
+
     # Гра закінчується, пропонується нова гра
     def end(self):
-        return KeyError
+        for i in range(125):
+            print("*", end="")
+        print()
+
+        game_time = round((time.time() - self.start_time)/60, 2)
+        print(f"Гра тривала {game_time} хв.")
+
+        self.deck = []
+        self.game_columns = []
+        self.reserve_columns = []
+        self.basic_columns = []
+
+        if input("Хочете почати наново? y/n") == 'y':
+            self.start()
+        else:
+            self.end()
     
     def GC_to_GC(self, out_path, in_path):
         out_path = int(out_path)
@@ -211,6 +241,7 @@ class Game:
                 return ValueError
             elif self.game_columns[in_path - 1].card_checking(self.game_columns[out_path - 1].last_card()):
                 self.game_columns[in_path - 1].put_in(self.game_columns[out_path - 1].pop_last_card())
+                self.show_table()
             else:
                 return ValueError
         else:
@@ -224,6 +255,7 @@ class Game:
         elif (out_path <= 7 and in_path <= 7) and (out_path > 0 and in_path > 0):
             if self.reserve_columns[in_path - 1].is_empty():
                 self.reserve_columns[in_path - 1].set_element(self.game_columns[out_path - 1].pop_last_card())
+                self.show_table()
             else:
                 return ValueError
         else:
@@ -237,6 +269,7 @@ class Game:
         elif (out_path <= 7 and in_path <= 4) and (out_path > 0 and in_path > 0):
             if self.basic_columns[in_path - 1].card_checking(self.game_columns[out_path - 1].last_card()):
                 self.basic_columns[in_path - 1].put_in(self.game_columns[out_path - 1].pop_last_card())
+                self.show_table()
             else:
                 return ValueError
         else:
@@ -250,6 +283,7 @@ class Game:
         elif (out_path <= 7 and in_path <= 4) and (out_path > 0 and in_path > 0):
             if self.basic_columns[in_path - 1].card_checking(self.reserve_columns[out_path - 1].get_element()):
                 self.basic_columns[in_path - 1].put_in(self.reserve_columns[out_path - 1].pop_element())
+                self.show_table()
             else:
                 return ValueError
         else:
@@ -272,7 +306,7 @@ class Game:
     #        return self.deck[-1]
     #     except:
     #        return ValueError
-    
+
     def deck_to_GC(self, in_path):
         in_path = int(in_path)
         if self.deck == []:
@@ -280,7 +314,12 @@ class Game:
         elif in_path <= 7 and in_path > 0:
             if self.game_columns[in_path - 1].is_empty():
                 self.game_columns[in_path - 1].put_in(self.deck.pop(-1))
+                self.show_table()
             else:
                 return ValueError
         else:
             return ValueError
+        
+    def show_rules(self):
+        with open("author and rules.txt", "r", encoding="utf-8") as rules:
+            print(rules.read())
