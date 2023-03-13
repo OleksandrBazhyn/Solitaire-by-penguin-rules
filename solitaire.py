@@ -2,6 +2,49 @@ import itertools
 import random
 import time
 
+def game_move(game):
+    try:
+        move = int(input("\nВаш хід:\n1 - переставити карту\n2 - показати Правила\n3 - показати стіл\n4 - закінчити гру"))
+        if move == 1:
+            move = int(input("\nПереставити карту:\n1 - з ігрової стопки\n2 - з резервної стопки в базову\n3 - з запасу в ігрову стопку"))
+            if move == 1:
+                move = int(input("\nЗ ігрової стопки:\n1 - в ігрову\n2 - в резервну\n3 - в базову"))
+                if move == 1:
+                    game.GC_to_GC(input("Вкажіть з якої:"), input("Вкажіть в яку:"))
+                    game_move(game)
+                elif move == 2:
+                    game.GC_to_RC(input("Вкажіть з якої:"), input("Вкажіть в яку:"))
+                    game_move(game)
+                elif move == 3:
+                    game.GC_to_BC(input("Вкажіть з якої:"), input("Вкажіть в яку:"))
+                    game_move(game)
+                else:
+                    print("\nНеправильно!")
+                    game_move(game)
+            elif move == 2:
+                game.RC_to_BC(input("Вкажіть з якої:"), input("Вкажіть в яку:"))
+                game_move(game)
+            elif move == 3:
+                game.deck_to_GC(input("Вкажіть в яку:"))
+                game_move(game)
+            else:
+                print("\nНеправильно!")
+                game_move(game)
+        elif move == 2:
+            game.show_rules()
+            game_move(game)
+        elif move == 3:
+            game.show_table()
+            game_move(game)
+        elif move == 4:
+            game.end()
+            game_move(game)
+        else:
+            print("\nНеправильно!")
+            game_move(game)
+    except:
+        game_move(game)
+
 class GameColumn:
         def __init__(self):
             self.items = []
@@ -17,9 +60,6 @@ class GameColumn:
 
         def is_empty(self):
             return len(self.items) == 0
-
-        def size(self):
-            return len(self.items)
         
         def __str__(self):
            return str(self.items)
@@ -43,7 +83,7 @@ class GameColumn:
             item_rank = 1
             try:
                 item_rank = int(rank)
-            except ValueError:
+            except:
                 if rank == 'J':
                     item_rank = 11
                 elif rank == 'Q':
@@ -101,7 +141,7 @@ class BasicColumn:
         item_rank = 1
         try:
             item_rank = int(rank)
-        except ValueError:
+        except:
             if rank == 'J':
                 item_rank = 11
             elif rank == 'Q':
@@ -112,9 +152,6 @@ class BasicColumn:
                 item_rank = 14
         return item_rank
 
-    def is_empty(self):
-       return len(self.items) == 0
-
     def size(self):
       return len(self.items)
         
@@ -123,7 +160,6 @@ class BasicColumn:
 
 class Game:
     start_time = None
-    end_time = None
     deck = []
     game_columns = []
     reserve_columns = []
@@ -180,6 +216,7 @@ class Game:
             # Виводимо резервні стопки на екран
             for i in range(7):
                 print(f"Резерв {i+1}: {self.reserve_columns[i]}")
+            print()
 
             # Виводимо ігрові стопки на екран 
             for i in range(7):
@@ -189,7 +226,8 @@ class Game:
             print("\nЗапас:")
             for el in self.deck:
                 print(el)
-
+            print()
+            
             # Виводимо базові стопки на екран
             for i in range(4):
                 print(f"Базова стопка {i+1}: {self.basic_columns[i]}")
@@ -232,7 +270,9 @@ class Game:
             self.start()
         else:
             self.end()
-    
+
+
+    # Ходи
     def GC_to_GC(self, out_path, in_path):
         out_path = int(out_path)
         in_path = int(in_path)
@@ -288,24 +328,6 @@ class Game:
                 return ValueError
         else:
             return ValueError
-        
-    # def deck_to_BC(self, in_path):
-    #     in_path = int(in_path)
-    #     if self.deck == []:
-    #             return ValueError
-    #     elif in_path <= 4 and in_path > 0:
-    #         if self.basic_columns[in_path - 1].card_checking(self.__last_deck_card()):
-    #             self.basic_columns[in_path - 1].put_in(self.deck.pop(-1))
-    #         else:
-    #             return ValueError
-    #     else:
-    #         return ValueError
-        
-    # def __last_deck_card(self):
-    #     try:
-    #        return self.deck[-1]
-    #     except:
-    #        return ValueError
 
     def deck_to_GC(self, in_path):
         in_path = int(in_path)
