@@ -43,6 +43,7 @@ def game_move(game):
             print("\nНеправильно!")
             game_move(game)
     except:
+        print("\nНеправильно!")
         game_move(game)
 
 class GameColumn:
